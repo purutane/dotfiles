@@ -1,0 +1,51 @@
+window:
+  dimensions:
+    columns:  160
+    lines:    48
+
+font:
+  size: 13
+  normal:
+    family: Ricty Diminished Discord
+    style:  Regular
+  bold:
+    family: Ricty Diminished Discord
+    style:  Bold
+  italic:
+    family: Ricty Diminished Discord
+    style:  Italic
+  bold_italic:
+    family: Ricty Diminished Discord
+    style:  Bold Italic
+
+# Colors (Hybrid)
+colors:
+  # Default colors
+  primary:
+    background: '#27292c'
+    foreground: '#d0d2d1'
+
+  # Normal colors
+  normal:
+    black:   '#35383b'
+    red:     '#b05655'
+    green:   '#769972'
+    yellow:  '#e1a574'
+    blue:    '#7693ac'
+    magenta: '#977ba0'
+    cyan:    '#749e99'
+    white:   '#848b92'
+
+  # Bright colors
+  bright:
+    black:   '#484c52'
+    red:     '#d27c7b'
+    green:   '#dffebe'
+    yellow:  '#f0d189'
+    blue:    '#96b1c9'
+    magenta: '#bfa5c7'
+    cyan:    '#9fc9c3'
+    white:   '#fcf7e2'
+
+background_opacity: 0.95
+
