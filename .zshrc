@@ -11,6 +11,9 @@ autoload -Uz compinit
 compinit
 # End of lines added by compinstall
 
+# PATH
+export PATH=${HOME}/.local/bin:${PATH}
+
 # editor
 export EDITOR=vim
 
@@ -28,4 +31,9 @@ zle -N history-beginning-search-backward-end history-search-end
 zle -N history-beginning-search-forward-end history-search-end
 bindkey "^p" history-beginning-search-backward-end
 bindkey "^n" history-beginning-search-forward-end
+
+# launch tmux
+if [[ ! -n ${TMUX} ]]; then
+    tmux new-session
+fi
 
