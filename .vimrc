@@ -1,13 +1,13 @@
-"dein Scripts-----------------------------
+"Start dein Scripts-----------------------------
 if &compatible
     set nocompatible
 endif
 
-" directories
 let s:dein_dir = expand('~/.vim/dein')
 let s:dein_repo_dir = s:dein_dir . '/repos/github.com/Shougo/dein.vim'
+let s:toml = s:dein_dir . '/rc/dein.toml'
+let s:lazy_toml = s:dein_dir . '/rc/dein_lazy.toml'
 
-" check if not exists clone
 if &runtimepath !~# '/dein.vim'
     if !isdirectory(s:dein_repo_dir)
         execute '!git clone https://github.com/Shougo/dein.vim' s:dein_repo_dir
@@ -15,28 +15,19 @@ if &runtimepath !~# '/dein.vim'
     execute 'set runtimepath+=' . s:dein_repo_dir
 endif
 
-" Required:
 call dein#begin(s:dein_dir)
 
-" Let dein manage dein
-" Required:
-call dein#add(s:dein_repo_dir)
+call dein#load_toml(s:toml, {'lazy': 0})
+call dein#load_toml(s:lazy_toml, {'lazy': 1})
 
-" Plugins
-call dein#add('w0ng/vim-hybrid')
-
-" Required:
 call dein#end()
 
-" Required:
 filetype plugin indent on
 syntax enable
 
-" If you want to install not installed plugins on startup.
 if dein#check_install()
     call dein#install()
 endif
-
 "End dein Scripts-------------------------
 
 set autoindent
