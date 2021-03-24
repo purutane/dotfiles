@@ -1,3 +1,10 @@
 [[plugins]]
 repo = 'Shougo/dein.vim'
 
+[[plugins]]
+repo = 'w0ng/vim-hybrid'
+hook_add = '''
+    set background=dark
+    autocmd my_auto_cmd VimEnter * nested colorscheme hybrid
+'''
+

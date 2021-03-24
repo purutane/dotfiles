@@ -3,6 +3,10 @@ if &compatible
     set nocompatible
 endif
 
+augroup my_auto_cmd
+    autocmd!
+augroup END
+
 let s:dein_dir = expand('~/.vim/dein')
 let s:dein_repo_dir = s:dein_dir . '/repos/github.com/Shougo/dein.vim'
 let s:toml = s:dein_dir . '/rc/dein.toml'
@@ -37,11 +41,7 @@ set expandtab
 
 set tabstop=4
 set softtabstop=4
-set shiftwidth=4
-
-" colorscheme
-set background=dark
-colorscheme hybrid
+set shiftwidth=0
 
 " appearnce
 set number
