@@ -1,0 +1,149 @@
+syntax enable
+filetype plugin indent on
+
+" leader
+let g:mapleader = "\<SPACE>"
+
+" Install vim-plug if not found
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+endif
+
+" Run PlugInstall if there are missing plugins
+autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
+  \| PlugInstall --sync | source $MYVIMRC
+\| endif 
+
+" vim-plug
+call plug#begin()
+Plug 'cocopon/iceberg.vim'
+Plug 'prabirshrestha/vim-lsp'
+Plug 'mattn/vim-lsp-settings'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'junegunn/fzf.vim'
+Plug 'itchyny/lightline.vim'
+Plug 'tpope/vim-fugitive'
+call plug#end()
+
+" lsp
+function! s:on_lsp_buffer_enabled() abort
+  setlocal omnifunc=lsp#complete
+  setlocal signcolumn=yes
+  if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
+  nmap <buffer> gd <plug>(lsp-definition)
+  nmap <buffer> gt <plug>(lsp-type-definition)
+  nmap <buffer> gs <plug>(lsp-document-symbol-search)
+  nmap <buffer> gS <plug>(lsp-workspace-symbol-search)
+  nmap <buffer> <leader>rn <plug>(lsp-rename)
+  nmap <buffer> [g <plug>(lsp-previous-diagnostic)
+  nmap <buffer> ]g <plug>(lsp-next-diagnostic)
+  nmap <buffer> K <plug>(lsp-hover)
+
+  let g:format_sync_timeout = 1000
+  autocmd! BufWritePre *.rs,*.py,*.js,*.ts,*.tsx execute('LspDocumentFormatSync')
+endfunction
+
+augroup lsp_install
+  autocmd!
+  autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+augroup END
+
+let g:lsp_diagnostics_echo_cursor = 1
+let g:lsp_diagnostics_virtual_text_enabled = 0
+
+" fzf
+nnoremap <silent> <leader>f :Files<CR>
+
+" lightline
+set laststatus=2
+set noshowmode
+
+function! LightlineLSPWarnings() abort
+  let l:counts = lsp#get_buffer_diagnostics_counts()
+  return l:counts.warning == 0 ? '' : printf('W:%d', l:counts.warning)
+endfunction
+
+function! LightlineLSPErrors() abort
+  let l:counts = lsp#get_buffer_diagnostics_counts()
+  return l:counts.error == 0 ? '' : printf('E:%d', l:counts.error)
+endfunction
+
+function! LightlineLSPOk() abort
+  let l:counts = lsp#get_buffer_diagnostics_counts()
+  let l:total = l:counts.error + l:counts.warning
+  return l:total == 0 ? 'OK' : ''
+endfunction
+
+augroup LightLineOnLSP
+  autocmd!
+  autocmd User lsp_diagnostics_updated call lightline#update()
+augroup END
+
+let g:lightline = {
+  \ 'active': {
+  \   'left': [
+  \       ['mode', 'paste'],
+  \       ['gitbranch', 'readonly', 'filename', 'modified'],
+  \   ],
+  \   'right': [
+  \       ['lineinfo' ],
+  \       ['percent' ],
+  \       ['fileformat', 'fileencoding', 'filetype'],
+  \       ['lsp_errors', 'lsp_warnings', 'lsp_ok'],
+  \   ],
+  \ },
+  \ 'component_expand': {
+  \   'lsp_warnings': 'LightlineLSPWarnings',
+  \   'lsp_errors':   'LightlineLSPErrors',
+  \   'lsp_ok':       'LightlineLSPOk',
+  \ },
+  \ 'component_type': {
+  \   'lsp_warnings': 'warning',
+  \   'lsp_errors':   'error',
+  \   'lsp_ok':       'middle',
+  \ },
+  \ 'component_function': {
+  \   'gitbranch': 'FugitiveHead',
+  \ },
+\ }
+
+" fugitive
+
+" indent & tab
+set autoindent
+set smartindent
+set smarttab
+set expandtab
+
+set tabstop=2
+set softtabstop=2
+set shiftwidth=0
+
+" appearnce
+set cursorline
+set cursorcolumn
+
+" transparent background
+augroup TransparentBG
+  autocmd!
+	autocmd Colorscheme * highlight Normal ctermbg=none
+	autocmd Colorscheme * highlight NonText ctermbg=none
+	autocmd Colorscheme * highlight LineNr ctermbg=none
+	autocmd Colorscheme * highlight Folded ctermbg=none
+	autocmd Colorscheme * highlight EndOfBuffer ctermbg=none 
+augroup END
+
+" line number
+set number
+augroup numbertoggle
+  autocmd!
+  autocmd BufEnter,FocusGained,InsertLeave,WinEnter * if &nu && mode() != "i" | set rnu   | endif
+  autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &nu                  | set nornu | endif
+augroup END
+
+" colorscheme
+colorscheme iceberg
+set background=dark
+

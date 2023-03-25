@@ -1,0 +1,33 @@
+# ignore all
+/*
+/.**
+
+# not ignore
+!/.Xmodmap
+!/.config/
+!/.config/alacritty/
+!/.config/alacritty/alacritty.yml
+!/.config/alacritty/iceberg.yml
+!/.config/
+!/.config/qtile/
+!/.config/qtile/autostart.sh
+!/.config/qtile/config.py
+!/.local/
+!/.local/bin/
+!/.local/bin/cap_maim.sh
+!/.profile
+!/.tmux.conf
+!/.vim/
+!/.vim/filetype.vim
+!/.vim/ftplugin/
+!/.vim/ftplugin/**
+!/.vim/vimrc
+!/.xprofile
+!/.zsh
+!/.zsh/.zshrc
+!/.zsh/antigen
+!/.zshenv
+!/install.sh
+
+!/README.md
+!/.gitignore

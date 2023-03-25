@@ -1,0 +1,27 @@
+env:
+  term: alacritty
+
+window:
+  dimensions:
+    columns:  160
+    lines:    48
+  opacity: 0.85
+
+font:
+  size: 10
+  normal:
+    family: NotoMono Nerd Font Mono
+    style:  Regular
+  bold:
+    family: NotoMono Nerd Font Mono
+    style:  Bold
+  italic:
+    family: NotoMono Nerd Font Mono
+    style:  Italic
+  bold_italic:
+    family: NotoMono Nerd Font Mono
+    style:  Bold Italic
+
+import:
+  - "~/.config/alacritty/iceberg.yml"
+
