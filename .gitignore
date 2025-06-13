@@ -9,7 +9,7 @@
 !/wezterm.lua
 
 # tmux
-!/.tmux.conf
+!/tmux.conf
 
 # nvim
 !/nvim/
