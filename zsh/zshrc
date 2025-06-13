@@ -15,7 +15,7 @@ esac
 # Usage: is_installed <command> <package_name>
 is_installed() {
   local cmd="$1"
-  local pkg_name="{$2:-$1}"
+  local pkg_name="${2:-$1}"
   if (( $+commands[$cmd] )); then
     return 0
   fi
