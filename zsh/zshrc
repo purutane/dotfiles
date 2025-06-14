@@ -131,14 +131,13 @@ if [[ -d "${ZDOTDIR}/modules/zsh-syntax-highlighting" ]]; then
 fi
 
 # fzf
-if is_installed "rg" "ripgrep"; then
-  export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!\.git/*"'
-fi
-export FZF_DEFAULT_OPT='--inline-info'
-FZF="${HOME}/.fzf.zsh"
-if [[ -f "${FZF}" ]]; then
+if is_installed "fzf"; then
   # shellcheck disable=SC1090
-  source "${FZF}"
+  source <(fzf --zsh)
+  if is_installed "rg" "ripgrep"; then
+    export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!\.git/*"'
+  fi
+  export FZF_DEFAULT_OPT='--inline-info'
 fi
 
 # direnv
