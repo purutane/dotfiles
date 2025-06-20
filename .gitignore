@@ -23,5 +23,9 @@
 /zsh/zprofile.local
 /zsh/zshrc.local
 
+# claude
+!/claude/
+!/claude/**
+
 # install script
 !/install.sh
