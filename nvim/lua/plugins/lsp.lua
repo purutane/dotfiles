@@ -134,42 +134,93 @@ return {
       })
       -- pyright
       local function get_python_path()
-        local python_path = vim.fn.system('pyenv which python 2>/dev/null'):gsub('%s+$', '')
-        if python_path == '' then
-          local system_cmd =
-            'PYENV_VERSION=system pyenv which python3 2>/dev/null || PYENV_VERSION=system pyenv which python2 2>/dev/null'
-          return vim.fn.system(system_cmd):gsub('%s+$', '')
+        -- 1. Active virtual environment
+        local venv_path = vim.env.VIRTUAL_ENV
+        if venv_path then
+          local python_path = venv_path .. '/bin/python'
+          if vim.fn.executable(python_path) == 1 then
+            return python_path
+          end
         end
-        return python_path
+
+        -- 2. Project-local .venv
+        local cwd = vim.fn.getcwd()
+        local local_venv = cwd .. '/.venv/bin/python'
+        if vim.fn.executable(local_venv) == 1 then
+          return local_venv
+        end
+
+        -- 3. UV-managed Python
+        local python_version_file = cwd .. '/.python-version'
+        if vim.fn.filereadable(python_version_file) == 1 then
+          local version = vim.fn.readfile(python_version_file)[1]
+          if version and version ~= '' then
+            local uv_python = vim.fn.system('uv python find ' .. version .. ' 2>/dev/null'):gsub('%s+$', '')
+            if uv_python ~= '' and vim.fn.executable(uv_python) == 1 then
+              return uv_python
+            end
+          end
+        end
+
+        -- 4. Best available UV-managed Python
+        local uv_python = vim.fn.system('uv python find 2>/dev/null'):gsub('%s+$', '')
+        if uv_python ~= '' and vim.fn.executable(uv_python) == 1 then
+          return uv_python
+        end
+
+        -- 5. System Python fallback
+        local system_python = vim.fn.system('which python3 2>/dev/null || which python2 2>/dev/null'):gsub('%s+$', '')
+        if system_python ~= '' and vim.fn.executable(system_python) == 1 then
+          return system_python
+        end
+
+        -- final fallback
+        return 'python3'
       end
-      local pythonPath = get_python_path()
       lspconfig.pyright.setup({
         capabilities = capabilities,
         root_dir = function(fname)
-          local project_root = require('lspconfig.util').root_pattern('.python-version')(fname)
-          if not project_root then
-            local file_dir = vim.fn.fnamemodify(fname, ':h')
-            local cwd = vim.fn.getcwd()
+          local util = require('lspconfig.util')
 
-            -- local cwd = vim.fn.getcwd()
-            return file_dir ~= '.' and file_dir or cwd
+          -- Detect by project markers
+          local markers = {
+            'pyproject.toml',
+            '.python-version',
+            'requirements.txt',
+            'setup.py',
+            '.git',
+          }
+
+          for _, marker in ipairs(markers) do
+            local project_root = util.root_pattern(marker)(fname)
+            if project_root then
+              return project_root
+            end
           end
-          return project_root
+
+          -- Fallback to current working directory if no project markers found
+          local file_dir = vim.fn.fnamemodify(fname, ':h')
+          local cwd = vim.fn.getcwd()
+          return file_dir ~= '.' and file_dir or cwd
         end,
         single_file_support = true,
         settings = {
           python = {
-            pythonPath = pythonPath,
+            pythonPath = get_python_path(),
             analysis = {
               typeCheckingMode = 'basic',
               autoSearchPaths = true,
               diagnosticMode = 'workspace',
               useLibraryCodeForTypes = true,
+              autoImportCompletions = true,
             },
           },
         },
         before_init = function(_, config)
           local cwd = vim.fn.getcwd()
+
+          -- Dynamically update python path
+          config.settings.python.pythonPath = get_python_path()
 
           config.settings = config.settings or {}
           config.settings.python = config.settings.python or {}
@@ -185,7 +236,12 @@ return {
       -- ruff
       lspconfig.ruff.setup({
         capabilities = capabilities,
-        root_dir = require('lspconfig.util').root_pattern('.python-version'),
+        root_dir = function(fname)
+          local util = require('lspconfig.util')
+          return util.root_pattern('pyproject.toml', '.python-version', 'requirements.txt', 'setup.py', '.git')(fname)
+            or vim.fn.getcwd()
+        end,
+        -- root_dir = require('lspconfig.util').root_pattern('.python-version'),
         settings = {
           lint = {
             select = {
