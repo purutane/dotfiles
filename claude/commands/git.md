@@ -5,7 +5,7 @@
 Analyze staged changes and generate commit message
 
 ```bash
-if ! git diff --staged --quiet; then
+if git diff --staged --quiet; then
   echo "No staged changes found. Please stage your changes first with 'git add'."
   exit 1
 fi
