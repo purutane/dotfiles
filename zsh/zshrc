@@ -1,0 +1,174 @@
+# shellcheck disable=SC2034
+typeset -U path PATH
+typeset -U fpath FPATH
+
+# --- Helper function for checking installed commands ---
+# OS detection for providing relevant installation hints
+# shellcheck disable=SC2168
+local ostype
+case "$(uname)" in
+  Darwin) ostype='macos' ;;
+  *) ostype='linux' ;;
+esac
+
+# Helper function to check for a command and print a hint if it's missing
+# Usage: is_installed <command> <package_name>
+is_installed() {
+  local cmd="$1"
+  local pkg_name="${2:-$1}"
+  if (( $+commands[$cmd] )); then
+    return 0
+  fi
+  echo "[dotfiles] Info: $cmd not found. Some features will be disabled." >&2
+  if [[ ${ostype} == 'macos' ]]; then
+    echo "[dotfiles] Hint: try 'brew install $pkg_name'" >&2
+  else
+    echo "[dotfiles] Hint: try 'sudo apt install $pkg_name'" >&2
+  fi
+  return 1
+}
+# --- End of helper function ---
+
+#HISTFILE=~/.zsh/.zsh_history
+HISTFILE="${ZDOTDIR}/.zsh_history"
+HISTSIZE=10000
+SAVEHIST=10000
+HISTORY_IGNORE="(^cd$|^pwd$|^ls$)"
+setopt hist_ignore_all_dups
+setopt hist_reduce_blanks
+setopt inc_append_history
+setopt share_history
+bindkey -v
+
+zstyle :compinstall filename "${ZDOTDIR}/.zshrc"
+
+# zsh completions
+if [[ -d "${ZDOTDIR}/modules/zsh-completions/src" ]]; then
+  # shellcheck disable=SC2206
+  fpath=("${ZDOTDIR}/modules/zsh-completions/src" $fpath)
+fi
+
+# shellcheck disable=SC2154
+if (( $+commands[brew] )); then
+  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+fi
+autoload -Uz compinit
+compinit
+
+# completion for ssh, scp
+if [[ -f ~/.ssh/config ]]; then
+  # shellcheck disable=SC2082,SC2296,SC2298
+  _cache_hosts=(${${${(M)${(f)"$(< ~/.ssh/config)"}:#Host *}#Host }})
+fi
+
+# completion for aws cli
+# shellcheck disable=SC2154
+if (( $+commands[aws_completer] )) || [[ -x /usr/local/bin/aws_completer ]]; then
+  autoload -Uz bashcompinit
+  bashcompinit
+  complete -C '/usr/local/bin/aws_completer' aws
+fi
+
+# prompt
+setopt prompt_subst
+
+update_venv_prompt() {
+  if [[ -n "${VIRTUAL_ENV}" ]]; then
+    local venv_name
+    venv_name=$(basename "${VIRTUAL_ENV}")
+    VENV_PROMPT_STRING="%K{214}%F{237} ${venv_name} %K{39}%F{214}%f"
+  else
+    VENV_PROMPT_STRING=""
+  fi
+}
+
+if is_installed "git"; then
+  update_git_prompt() {
+    if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      GIT_PROMPT_STRING='%F{39}%f'
+      return
+    fi
+
+    local branch
+    branch=$(git symbolic-ref --short HEAD 2>/dev/null) || branch=$(git rev-parse --short HEAD 2>/dev/null)
+
+    local symbols
+    symbols=""
+    if ! git diff --quiet --cached --exit-code; then
+      symbols+='+'
+    fi
+    if [[ -n $(git status --porcelain) ]]; then
+      if ! git diff --quiet --exit-code || [[ -n $(git ls-files --others --exclude-standard) ]]; then
+        symbols+='*'
+      fi
+    fi
+
+    if [[ -n "$symbols" ]]; then
+      GIT_PROMPT_STRING="%K{135}%F{39}%f  ${branch} ${symbols} %k%F{135}%f"
+    else
+      GIT_PROMPT_STRING="%K{135}%F{39}%f  ${branch} %k%F{135}%f"
+    fi
+  }
+
+  precmd() {
+    update_git_prompt
+    update_venv_prompt
+  }
+
+  PROMPT='${VENV_PROMPT_STRING}%K{39}%F{237}  %1~ %k%f${GIT_PROMPT_STRING} '
+else
+  precmd() {
+    update_venv_prompt
+  }
+  PROMPT='${VENV_PROMPT_STRING}%K{39}%F{237}  %1~ %k%F{39}%f '
+fi
+
+# alias
+alias ls='ls --color=auto'
+if is_installed "nvim" "neovim"; then
+  alias vim='nvim'
+  alias view='nvim -R'
+  if is_installed "fzf"; then
+    alias vf='nvim $(fzf)'
+  fi
+fi
+
+# zsh-autosuggestions
+if [[ -d "${ZDOTDIR}/modules/zsh-autosuggestions" ]]; then
+  source "${ZDOTDIR}/modules/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  bindkey '^e' autosuggest-accept
+fi
+
+# zsh-syntax-highlighting
+if [[ -d "${ZDOTDIR}/modules/zsh-syntax-highlighting" ]]; then
+  source "${ZDOTDIR}/modules/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+fi
+
+# fzf
+if is_installed "fzf"; then
+  # shellcheck disable=SC1090
+  source <(fzf --zsh)
+  if is_installed "rg" "ripgrep"; then
+    export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!\.git/*"'
+  fi
+  export FZF_DEFAULT_OPT='--inline-info'
+fi
+
+# direnv
+if is_installed "direnv"; then
+  eval "$(direnv hook zsh)"
+fi
+
+# launch tmux
+if is_installed "tmux"; then
+  if [[ -z ${TMUX} ]] && [[ -z "${VSCODE_ZDOTDIR:-}" ]]; then
+    if [[ -z $(tmux list-session 2>/dev/null | grep main) ]]; then
+      tmux new-session -s main -n main
+    else
+      tmux new-session
+    fi
+  fi
+fi
+
+# .zshrc.local
+[[ -f "${ZDOTDIR}/.zshrc.local" ]] && source "${ZDOTDIR}/.zshrc.local"

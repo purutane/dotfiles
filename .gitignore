@@ -1,0 +1,27 @@
+# ignore all
+/**
+
+# git
+!/.gitignore
+!/.gitmodules
+
+# wezterm
+!/wezterm.lua
+
+# tmux
+!/tmux.conf
+
+# nvim
+!/nvim/
+!/nvim/**
+/nvim/lazy-lock.json
+
+# zsh
+!/zshenv
+!/zsh/
+!/zsh/**
+/zsh/zprofile.local
+/zsh/zshrc.local
+
+# install script
+!/install.sh

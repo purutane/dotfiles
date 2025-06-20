@@ -1,0 +1,29 @@
+{
+  "Terraform AWS Provider": {
+    "prefix": "tfprovider",
+    "body": [
+      "terraform {",
+      "  required_version = \">= 1.0\"",
+      "  ",
+      "  required_providers {",
+      "    aws = {",
+      "      source  = \"hashicorp/aws\"",
+      "      version = \"~> 5.0\"",
+      "    }",
+      "  }",
+      "}",
+      "",
+      "provider \"aws\" {",
+      "  region = \"${1:ap-northeast-1}\"",
+      "  ",
+      "  default_tags {",
+      "    tags = {",
+      "      Project     = \"${2:project-name}\"",
+      "      Environment = \"${3:dev}\"",
+      "      ManagedBy   = \"Terraform\"",
+      "    }",
+      "  }",
+      "}"
+    ]
+  }
+}
