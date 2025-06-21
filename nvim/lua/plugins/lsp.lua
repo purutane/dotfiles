@@ -245,11 +245,25 @@ return {
         settings = {
           lint = {
             select = {
-              'E', -- flake8
-              'F', -- flake8
-              'W', -- flake8
+              'E', -- pycodestyle errors
+              'F', -- pyflakes
+              'W', -- pycodestyle warnings
               'I', -- isort
-              'UP', --pyupgrade
+              'UP', -- pyupgrade
+              'N', -- pep8-naming
+              'B', -- flake8-bugbear
+              'A', -- flake8-builtins
+              'C4', -- flake8-comprehensions
+              'DTZ', -- flake8-datetimez
+              'T10', -- flake8-debugger
+              'EM', -- flake8-errmsg
+              'ISC', -- flake8-implicit-str-concat
+              'RET', -- flake8-return
+              'SIM', -- flake8-simplify
+              'TCH', -- flake8-type-checking
+              'PTH', -- flake8-use-pathlib
+              'PL', -- pylint
+              'RUF', -- ruff-specific rules
             },
             ignore = {},
           },
