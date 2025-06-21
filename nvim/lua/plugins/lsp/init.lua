@@ -17,7 +17,6 @@ return {
       'mason-org/mason-lspconfig.nvim',
     },
     config = function()
-      print('Setting up LSP...')
       -- Common setup
       require('plugins.lsp.keymaps').setup()
       require('plugins.lsp.diagnostics').setup()
