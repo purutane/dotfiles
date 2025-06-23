@@ -1,6 +1,9 @@
 # ignore all
 /**
 
+# README.md
+!/README.md
+
 # git
 !/.gitignore
 !/.gitmodules
