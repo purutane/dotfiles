@@ -45,6 +45,8 @@ return {
         'ts_ls',
         'html',
         'cssls',
+        -- json
+        'jsonls',
       },
       automatic_installation = true,
       automatic_enable = {
@@ -64,6 +66,8 @@ return {
           'ts_ls',
           'html',
           'cssls',
+          -- json - handled by nvim-lspconfig
+          'jsonls',
         },
       },
     },

@@ -30,6 +30,7 @@ return {
       require('plugins.lsp.servers.web').setup(capabilities)
       require('plugins.lsp.servers.bash').setup(capabilities)
       require('plugins.lsp.servers.python').setup(capabilities)
+      require('plugins.lsp.servers.json').setup(capabilities)
     end,
   },
 }

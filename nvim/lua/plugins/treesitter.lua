@@ -37,6 +37,7 @@ return {
           'javascript',
           'html',
           'css',
+          'json',
         },
 
         highlight = { enable = true },
