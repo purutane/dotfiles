@@ -40,6 +40,7 @@ return {
         'bashls',
         -- terraform
         'terraformls',
+        'tflint',
         -- astro
         'astro',
         'ts_ls',
