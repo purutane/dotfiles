@@ -49,3 +49,10 @@ if vim.fn.isdirectory(undodir) == 0 then
   vim.fn.mkdir(undodir, 'p')
 end
 opt.undodir = undodir
+
+-- Auto reload files changed outside of Neovim
+opt.autoread = true
+vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold' }, {
+  group = vim.api.nvim_create_augroup('AutoRead', { clear = true }),
+  command = 'checktime',
+})
