@@ -1,8 +1,6 @@
 local M = {}
 
 function M.setup(capabilities)
-  local lspconfig = require('lspconfig')
-
   local function get_root_dir(fname)
     local util = require('lspconfig.util')
     local root = util.root_pattern('.terraform', '*.tf')(fname)
@@ -13,7 +11,7 @@ function M.setup(capabilities)
   end
 
   -- terraform-ls
-  lspconfig.terraformls.setup({
+  vim.lsp.config('terraformls', {
     capabilities = capabilities,
     root_dir = get_root_dir,
     filetypes = { 'terraform', 'terraform-vars', 'hcl' },
@@ -30,9 +28,10 @@ function M.setup(capabilities)
       client.server_capabilities.documentHighlightProvider = false
     end,
   })
+  vim.lsp.enable('terraformls')
 
   -- tflint
-  lspconfig.tflint.setup({
+  vim.lsp.config('tflint', {
     capabilities = capabilities,
     root_dir = get_root_dir,
     filetypes = { 'terraform', 'terraform-vars', 'hcl' },
@@ -46,6 +45,7 @@ function M.setup(capabilities)
       end
     end,
   })
+  vim.lsp.enable('tflint')
 end
 
 return M

@@ -1,10 +1,8 @@
 local M = {}
 
 function M.setup(capabilities)
-  local lspconfig = require('lspconfig')
-
   -- ts_ls (typescript, javascript)
-  lspconfig.ts_ls.setup({
+  vim.lsp.config('ts_ls', {
     capabilities = capabilities,
     root_dir = require('lspconfig.util').root_pattern('package.json', 'tsconfig.json', '.git'),
     filetypes = { 'typescript', 'typescriptreact', 'javascript', 'javascriptreact' },
@@ -16,9 +14,10 @@ function M.setup(capabilities)
       },
     },
   })
+  vim.lsp.enable('ts_ls')
 
   -- astro
-  lspconfig.astro.setup({
+  vim.lsp.config('astro', {
     capabilities = capabilities,
     filetypes = { 'astro' },
     init_options = {
@@ -33,9 +32,10 @@ function M.setup(capabilities)
       client.server_capabilities.documentRangeFormattingProvider = false
     end,
   })
+  vim.lsp.enable('astro')
 
   -- html
-  lspconfig.html.setup({
+  vim.lsp.config('html', {
     capabilities = capabilities,
     filetypes = { 'html' },
     init_options = {
@@ -50,9 +50,10 @@ function M.setup(capabilities)
       },
     },
   })
+  vim.lsp.enable('html')
 
   -- cssls
-  lspconfig.cssls.setup({
+  vim.lsp.config('cssls', {
     capabilities = capabilities,
     filetypes = { 'css', 'scss', 'sass', 'less' },
     settings = {
@@ -64,6 +65,7 @@ function M.setup(capabilities)
       },
     },
   })
+  vim.lsp.enable('cssls')
 end
 
 return M

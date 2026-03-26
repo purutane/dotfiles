@@ -102,6 +102,12 @@ return {
               prompt_position = 'bottom',
             },
           },
+          file_ignore_patterns = {
+            '^%.terraform/',
+            '%.tfstate$',
+            '%.tfstate%.backup$',
+            '%.terraform%.lock%.hcl$',
+          },
           prompt_prefix = ' 󰍉 ',
           selection_caret = ' 󰄾 ',
           entry_prefix = '  ',
@@ -126,12 +132,12 @@ return {
         pickers = {
           find_files = {
             hidden = true,
-            no_ignore = true,
+            -- no_ignore = true,
           },
           live_grep = {
-            additional_args = function()
-              return { '--hidden', '--no-ignore' }
-            end,
+            -- additional_args = function()
+            --   return { '--hidden', '--no-ignore' }
+            -- end,
           },
         },
       })

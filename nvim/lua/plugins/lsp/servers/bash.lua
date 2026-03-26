@@ -1,9 +1,8 @@
 local M = {}
 
 function M.setup(capabilities)
-  local lspconfig = require('lspconfig')
   -- bashls
-  lspconfig.bashls.setup({
+  vim.lsp.config('bashls', {
     capabilities = capabilities,
     root_dir = function(fname)
       return require('lspconfig.util').find_git_ancestor(fname) or vim.fn.getcwd()
@@ -23,6 +22,7 @@ function M.setup(capabilities)
       },
     },
   })
+  vim.lsp.enable('bashls')
 end
 
 return M

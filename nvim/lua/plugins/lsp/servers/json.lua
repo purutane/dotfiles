@@ -1,9 +1,7 @@
 local M = {}
 
 function M.setup(capabilities)
-  local lspconfig = require('lspconfig')
-
-  lspconfig.jsonls.setup({
+  vim.lsp.config('jsonls', {
     capabilities = capabilities,
     filetypes = { 'json', 'jsonc' },
     settings = {
@@ -13,6 +11,7 @@ function M.setup(capabilities)
       },
     },
   })
+  vim.lsp.enable('jsonls')
 end
 
 return M

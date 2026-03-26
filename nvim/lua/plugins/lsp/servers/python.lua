@@ -1,8 +1,6 @@
 local M = {}
 
 function M.setup(capabilities)
-  local lspconfig = require('lspconfig')
-
   local function get_python_path()
     -- Helper function for safe system command execution
     local function safe_system_call(cmd)
@@ -105,9 +103,10 @@ function M.setup(capabilities)
   end
 
   -- pyright
-  lspconfig.pyright.setup({
+  vim.lsp.config('pyright', {
     capabilities = capabilities,
-    root_dir = get_python_root_dir,
+    filetypes = { 'python' },
+    -- root_dir = get_python_root_dir,
     single_file_support = true,
     settings = {
       python = {
@@ -131,10 +130,12 @@ function M.setup(capabilities)
       }
     end,
   })
+  vim.lsp.enable('pyright')
   -- ruff
-  lspconfig.ruff.setup({
+  vim.lsp.config('ruff', {
     capabilities = capabilities,
-    root_dir = get_python_root_dir,
+    filetypes = { 'python' },
+    -- root_dir = get_python_root_dir,
     settings = {
       lint = {
         select = {
@@ -173,11 +174,12 @@ function M.setup(capabilities)
       client.server_capabilities.hoverProvider = false
       client.server_capabilities.documentHighlightProvider = false
       client.server_capabilities.documentSymbolProvider = false
-      client.server_capabilities.defiinitionProvider = false
+      client.server_capabilities.definitionProvider = false
       client.server_capabilities.referencesProvider = false
       client.server_capabilities.renameProvider = false
     end,
   })
+  vim.lsp.enable('ruff')
 end
 
 return M
