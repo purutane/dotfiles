@@ -29,4 +29,5 @@ ln -snfv "${DOTFILES_ROOT}/zsh/modules" "${HOME}/.config/zsh/modules"
 
 # claude
 echo "Linking claude configuration files..."
-ln -snfv "${DOTFILES_ROOT}/claude/commands" "${HOME}/.claude/commands"
+# ln -snfv "${DOTFILES_ROOT}/claude/commands" "${HOME}/.claude/commands"
+ln -snfv "${DOTFILES_ROOT}/claude/skills" "${HOME}/.claude/skills"
