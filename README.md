@@ -61,7 +61,7 @@ A collection of configuration files for a modern development environment with Ne
 - **Padding**: Consistent window padding
 
 ### Claude Integration (`claude/`)
-- **Custom Commands**: Specialized commit message generation
+- **Skills**: Specialized commit message generation
 
 ## Installation Details
 
@@ -75,7 +75,7 @@ The `install.sh` script creates symbolic links for all configuration files:
   - `~/.config/zsh/.zshrc`
   - `~/.config/zsh/.zprofile`
   - `~/.config/zsh/modules/` (plugins)
-- **Claude**: `~/.claude/commands/`
+- **Claude**: `~/.claude/skills/`
 
 ## Dependencies
 
