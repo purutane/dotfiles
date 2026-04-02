@@ -1,7 +1,8 @@
 local M = {}
 
 function M.setup(capabilities)
-  local function get_root_dir(fname)
+  local function get_root_dir(bufnr)
+    local fname = vim.api.nvim_buf_get_name(bufnr)
     local util = require('lspconfig.util')
     local root = util.root_pattern('.terraform', '*.tf')(fname)
     if root then

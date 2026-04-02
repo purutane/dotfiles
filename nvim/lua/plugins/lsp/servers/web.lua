@@ -4,7 +4,10 @@ function M.setup(capabilities)
   -- ts_ls (typescript, javascript)
   vim.lsp.config('ts_ls', {
     capabilities = capabilities,
-    root_dir = require('lspconfig.util').root_pattern('package.json', 'tsconfig.json', '.git'),
+    root_dir = function(bufnr)
+      local fname = vim.api.nvim_buf_get_name(bufnr)
+      return require('lspconfig.util').root_pattern('package.json', 'tsconfig.json', '.git')(fname)
+    end,
     filetypes = { 'typescript', 'typescriptreact', 'javascript', 'javascriptreact' },
     settings = {
       typescript = {

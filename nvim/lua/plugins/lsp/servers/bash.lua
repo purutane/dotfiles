@@ -4,7 +4,8 @@ function M.setup(capabilities)
   -- bashls
   vim.lsp.config('bashls', {
     capabilities = capabilities,
-    root_dir = function(fname)
+    root_dir = function(bufnr)
+      local fname = vim.api.nvim_buf_get_name(bufnr)
       return require('lspconfig.util').find_git_ancestor(fname) or vim.fn.getcwd()
     end,
     filetypes = { 'sh', 'bash', 'zsh' },
