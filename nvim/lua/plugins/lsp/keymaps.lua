@@ -18,18 +18,7 @@ function M.setup()
       vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
       vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
       vim.keymap.set('n', '<leader>f', function()
-        -- Format logic
-        local filetype = vim.bo.filetype
-        if filetype == 'astro' then
-          vim.lsp.buf.format({
-            async = true,
-            filter = function(client)
-              return client.name == 'null-ls'
-            end,
-          })
-        else
-          vim.lsp.buf.format({ async = true })
-        end
+        require('conform').format({ async = true, lsp_format = 'fallback' })
       end, opts)
       -- Workspace
       vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, opts)
