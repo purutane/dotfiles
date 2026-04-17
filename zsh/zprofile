@@ -15,6 +15,7 @@ export VIRTUAL_ENV_DISABLE_PROMPT=1
 
 # local bin
 [[ -d "${HOME}/bin" ]] && export PATH="${HOME}/bin:${PATH}"
+[[ -d "${HOME}/.local/bin" ]] && export PATH="${HOME}/.local/bin:${PATH}"
 
 # editor
 export EDITOR=nvim
