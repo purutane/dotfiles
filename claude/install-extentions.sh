@@ -37,8 +37,18 @@ register_newrelic() {
   echo "✅ Registered: newrelic"
 }
 
+register_slack() {
+  if claude plugin list 2>/dev/null | grep -q 'slack@claude-plugins-official'; then
+    echo "⏭  Skipped: slack already installed"
+    return 0
+  fi
+  claude plugin install slack
+  echo "✅ Registered: slack"
+}
+
 register_backlog
 register_newrelic
+register_slack
 
 echo ""
 claude mcp list
