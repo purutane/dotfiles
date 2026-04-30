@@ -1,7 +1,7 @@
 ---
 name: commit
 description: Generate a commit message from staged changes and commit.
-allowed-tools: Bash(git diff:*), Bash(git status:*), Bash(git log:*), Bash(git commit:*)
+allowed-tools: Bash(git diff:*), Bash(git status:*), Bash(git log:*)
 argument-hint: "[optional: e.g., 'closes #123', 'breaking change', or any extra context]"
 ---
 
@@ -103,11 +103,14 @@ Rename all env vars from MYAPP_* to APP_* for consistency.
 BREAKING CHANGE: existing env variables must be renamed
 ```
 
-5. **Present and confirm**
-   Show the proposed message to the user. If approved, execute the commit:
-   - **Single-line message**: `git commit -m "type(scope): description"`
-   - **Multi-line message**: use separate `-m` flags for each paragraph:
-     ```
-     git commit -m "type(scope): description" -m "body paragraph" -m "footer"
-     ```
-     If the user wants changes, revise and confirm again.
+5. **Present and wait for explicit approval**
+   Show the proposed commit message to the user and **stop**. Do NOT run `git commit` until the user has explicitly approved the message in a follow-up turn (e.g., "OK", "commit it", "yes", "go ahead", or an equivalent affirmative).
+
+   - Showing the message is not approval. A prior `/commit` invocation is not approval.
+   - If the user requests changes, revise the message, present again, and wait for approval once more.
+   - Only after explicit approval, execute the commit:
+     - **Single-line message**: `git commit -m "type(scope): description"`
+     - **Multi-line message**: use separate `-m` flags for each paragraph:
+       ```
+       git commit -m "type(scope): description" -m "body paragraph" -m "footer"
+       ```
