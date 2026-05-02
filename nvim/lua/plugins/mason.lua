@@ -13,11 +13,6 @@ return {
     event = 'VeryLazy',
     build = ':MasonUpdate',
     opts = {
-      ensure_installed = {
-        'stylua',
-        'shellcheck',
-        'prettier',
-      },
       ui = {
         border = 'rounded',
         icons = {
@@ -26,6 +21,21 @@ return {
           package_uninstalled = '✗',
         },
       },
+    },
+  },
+  {
+    'WhoIsSethDaniel/mason-tool-installer.nvim',
+    dependencies = {
+      'mason-org/mason.nvim',
+    },
+    opts = {
+      ensure_installed = {
+        'stylua',
+        'shellcheck',
+        'prettierd',
+      },
+      auto_update = false,
+      run_on_start = true,
     },
   },
   {
@@ -53,6 +63,8 @@ return {
         'cssls',
         -- json
         'jsonls',
+        -- yaml
+        'yamlls',
       },
       automatic_installation = true,
       automatic_enable = {
@@ -74,6 +86,8 @@ return {
           'cssls',
           -- json - handled by nvim-lspconfig
           'jsonls',
+          -- yaml - handled by nvim-lspconfig
+          'yamlls',
         },
       },
     },
