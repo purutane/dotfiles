@@ -4,8 +4,6 @@ typeset -U fpath FPATH
 
 # --- Helper function for checking installed commands ---
 # OS detection for providing relevant installation hints
-# shellcheck disable=SC2168
-local ostype
 case "$(uname)" in
   Darwin) ostype='macos' ;;
   *) ostype='linux' ;;
@@ -129,7 +127,10 @@ if is_installed "nvim" "neovim"; then
   alias vim='nvim'
   alias view='nvim -R'
   if is_installed "fzf"; then
-    alias vf='nvim $(fzf)'
+    vf() {
+      local file
+      file=$(fzf) && nvim "${file}"
+    }
   fi
 fi
 
@@ -151,7 +152,7 @@ if is_installed "fzf"; then
   if is_installed "rg" "ripgrep"; then
     export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!\.git/*"'
   fi
-  export FZF_DEFAULT_OPT='--inline-info'
+  export FZF_DEFAULT_OPTS='--inline-info'
 fi
 
 # direnv
@@ -162,10 +163,10 @@ fi
 # launch tmux
 if is_installed "tmux"; then
   if [[ -z ${TMUX} ]] && [[ -z "${VSCODE_ZDOTDIR:-}" ]]; then
-    if [[ -z $(tmux list-session 2>/dev/null | grep main) ]]; then
+    if ! tmux has-session -t=main 2>/dev/null; then
       tmux new-session -s main -n main
     else
-      tmux new-session
+      tmux new-session -t=main
     fi
   fi
 fi
