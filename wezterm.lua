@@ -1,4 +1,4 @@
-local wezterm = require('wezterm')
+local wezterm = require("wezterm")
 
 local config = {}
 
@@ -9,14 +9,18 @@ end
 config.ssh_domains = {}
 
 -- font size
-config.font = wezterm.font('UDEV Gothic 35NFLG')
-config.font_size = 14.0
+config.font = wezterm.font("UDEV Gothic 35NFLG")
+if wezterm.target_triple == "x86_64-unknown-linux-gnu" then
+  config.font_size = 12.0
+else
+  config.font_size = 14.0
+end
 
 -- window size
 config.initial_cols = 120
 config.initial_rows = 30
 
-config.color_scheme = 'tokyonight_storm'
+config.color_scheme = "tokyonight_storm"
 
 config.enable_tab_bar = false
 

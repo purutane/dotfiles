@@ -8,6 +8,9 @@
 !/.gitignore
 !/.gitmodules
 
+# .stylua.toml
+!/.stylua.toml
+
 # wezterm
 !/wezterm.lua
 
