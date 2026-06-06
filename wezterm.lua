@@ -9,7 +9,10 @@ end
 config.ssh_domains = {}
 
 -- font size
-config.font = wezterm.font("UDEV Gothic 35NFLG")
+config.font = wezterm.font_with_fallback({
+  "UDEV Gothic 35NFLG",
+  "Symbols Nerd Font Mono",
+})
 if wezterm.target_triple == "x86_64-unknown-linux-gnu" then
   config.font_size = 12.0
 else
