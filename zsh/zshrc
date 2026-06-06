@@ -67,59 +67,73 @@ if (( $+commands[aws_completer] )) || [[ -x /usr/local/bin/aws_completer ]]; the
   complete -C '/usr/local/bin/aws_completer' aws
 fi
 
-# prompt
+# --- prompt -------------------------------------------------------------
+# One-line prompt.
+#   Left  : path + vi-mode-aware symbol (green on success, red on error)
+#   Right : git branch/status + venv  (RPROMPT)
+# Colors use the Tokyo Night Storm palette to match the terminal theme:
+#   blue #7aa2f7  purple #bb9af7  green #9ece6a  yellow #e0af68
+#   orange #ff9e64  gray #565f89  red #f7768e
 setopt prompt_subst
 
 update_venv_prompt() {
   if [[ -n "${VIRTUAL_ENV}" ]]; then
-    local venv_name
-    venv_name=$(basename "${VIRTUAL_ENV}")
-    VENV_PROMPT_STRING="%K{214}%F{237} ${venv_name} %K{39}%F{214}%f"
+    VENV_PROMPT_STRING=" %F{#ff9e64}(${VIRTUAL_ENV:t})%f"
   else
     VENV_PROMPT_STRING=""
   fi
 }
 
+# vi-mode aware prompt symbol: ❯ in insert, ❮ in normal mode.
+# Registered via add-zle-hook-widget so it coexists with the zle plugins
+# sourced later (autosuggestions / syntax-highlighting).
+PROMPT_SYMBOL='❯'
+autoload -Uz add-zle-hook-widget
+_update_prompt_symbol() {
+  case $KEYMAP in
+    vicmd) PROMPT_SYMBOL='❮' ;;
+    *)     PROMPT_SYMBOL='❯' ;;
+  esac
+  zle reset-prompt
+}
+add-zle-hook-widget line-init     _update_prompt_symbol
+add-zle-hook-widget keymap-select _update_prompt_symbol
+
 if is_installed "git"; then
   update_git_prompt() {
     if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-      GIT_PROMPT_STRING='%F{39}%f'
+      GIT_PROMPT_STRING=''
       return
     fi
 
     local branch
     branch=$(git symbolic-ref --short HEAD 2>/dev/null) || branch=$(git rev-parse --short HEAD 2>/dev/null)
 
-    local symbols
-    symbols=""
+    local symbols=''
     if ! git diff --quiet --cached --exit-code; then
-      symbols+='+'
+      symbols+='%F{#9ece6a}+%f'   # staged
     fi
-    if [[ -n $(git status --porcelain) ]]; then
-      if ! git diff --quiet --exit-code || [[ -n $(git ls-files --others --exclude-standard) ]]; then
-        symbols+='*'
-      fi
+    if ! git diff --quiet --exit-code || [[ -n $(git ls-files --others --exclude-standard) ]]; then
+      symbols+='%F{#e0af68}*%f'   # unstaged / untracked
     fi
 
-    if [[ -n "$symbols" ]]; then
-      GIT_PROMPT_STRING="%K{135}%F{39}%f  ${branch} ${symbols} %k%F{135}%f"
-    else
-      GIT_PROMPT_STRING="%K{135}%F{39}%f  ${branch} %k%F{135}%f"
-    fi
+    GIT_PROMPT_STRING=" %F{#565f89}%f %F{#bb9af7}${branch}%f"
+    [[ -n "$symbols" ]] && GIT_PROMPT_STRING+=" ${symbols}"
   }
 
   precmd() {
     update_git_prompt
     update_venv_prompt
   }
-
-  PROMPT='${VENV_PROMPT_STRING}%K{39}%F{237}  %1~ %k%f${GIT_PROMPT_STRING} '
 else
   precmd() {
+    GIT_PROMPT_STRING=''
     update_venv_prompt
   }
-  PROMPT='${VENV_PROMPT_STRING}%K{39}%F{237}  %1~ %k%F{39}%f '
 fi
+
+PROMPT='%F{#7aa2f7}%1~%f %(?.%F{#9ece6a}.%F{#f7768e})${PROMPT_SYMBOL}%f '
+RPROMPT='${GIT_PROMPT_STRING}${VENV_PROMPT_STRING}'
 
 # alias
 alias ls='ls --color=auto'
