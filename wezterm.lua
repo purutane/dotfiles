@@ -34,4 +34,25 @@ config.window_padding = {
   bottom = 10,
 }
 
+-- scrollback (mostly managed by tmux; this is for tmux-less usage)
+config.scrollback_lines = 20000
+
+-- Shift+Enter sends ESC+CR = newline in Claude Code (passes through tmux as-is)
+config.keys = {
+  { key = "Enter", mods = "SHIFT", action = wezterm.action.SendString("\x1b\r") },
+}
+
+-- bell -> sound + toast notification (tmux forwards pane bells)
+-- macOS: play Blow instead of the system beep. others: keep the default beep.
+local is_macos = wezterm.target_triple:find("apple%-darwin") ~= nil
+if is_macos then
+  config.audible_bell = "Disabled"
+end
+wezterm.on("bell", function(window, pane)
+  if is_macos then
+    wezterm.background_child_process({ "afplay", "/System/Library/Sounds/Blow.aiff" })
+  end
+  window:toast_notification("WezTerm", "タスク完了: " .. pane:get_title(), nil, 4000)
+end)
+
 return config
