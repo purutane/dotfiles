@@ -37,6 +37,14 @@ register_newrelic() {
   echo "✅ Registered: newrelic"
 }
 
+register_aws_knowledge() {
+  remove_if_exists aws-knowledge
+  claude mcp add aws-knowledge https://knowledge-mcp.global.api.aws \
+    --scope user \
+    --transport http
+  echo "✅ Registered: aws-knowledge"
+}
+
 register_slack() {
   if claude plugin list 2>/dev/null | grep -q 'slack@claude-plugins-official'; then
     echo "⏭  Skipped: slack already installed"
@@ -48,6 +56,7 @@ register_slack() {
 
 register_backlog
 register_newrelic
+register_aws_knowledge
 register_slack
 
 echo ""
