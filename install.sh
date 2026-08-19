@@ -31,3 +31,19 @@ ln -snfv "${DOTFILES_ROOT}/zsh/modules" "${HOME}/.config/zsh/modules"
 echo "Linking claude configuration files..."
 # ln -snfv "${DOTFILES_ROOT}/claude/commands" "${HOME}/.claude/commands"
 ln -snfv "${DOTFILES_ROOT}/claude/skills" "${HOME}/.claude/skills"
+ln -snfv "${DOTFILES_ROOT}/claude/hooks" "${HOME}/.claude/hooks"
+
+# claude settings: merge only the shared "hooks" key into settings.json.
+# settings.json itself stays machine-local (permissions/plugins differ per PC)
+# and must not be a symlink (Claude Code's atomic writes would replace it).
+CLAUDE_SETTINGS="${HOME}/.claude/settings.json"
+if command -v jq >/dev/null 2>&1; then
+  mkdir -p "${HOME}/.claude"
+  [[ -f "${CLAUDE_SETTINGS}" ]] || echo '{}' > "${CLAUDE_SETTINGS}"
+  tmp=$(mktemp)
+  jq -s '.[0] * .[1]' "${CLAUDE_SETTINGS}" "${DOTFILES_ROOT}/claude/settings.hooks.json" > "${tmp}" \
+    && mv "${tmp}" "${CLAUDE_SETTINGS}" \
+    && echo "Merged claude hooks into ${CLAUDE_SETTINGS}"
+else
+  echo "jq not found; skipped merging claude hooks into ${CLAUDE_SETTINGS}" >&2
+fi
