@@ -43,15 +43,20 @@ config.keys = {
 }
 
 -- bell -> sound + toast notification (tmux forwards pane bells)
--- macOS: play Blow instead of the system beep. others: keep the default beep.
+-- wezterm itself has no audio path (the binary links no audio library, and
+-- SystemBeep is a no-op under Wayland), so play the sound ourselves.
 local is_macos = wezterm.target_triple:find("apple%-darwin") ~= nil
+config.audible_bell = "Disabled"
+
+local bell_sound
 if is_macos then
-  config.audible_bell = "Disabled"
+  bell_sound = { "afplay", "/System/Library/Sounds/Blow.aiff" }
+else
+  bell_sound = { "paplay", "/usr/share/sounds/freedesktop/stereo/complete.oga" }
 end
+
 wezterm.on("bell", function(window, pane)
-  if is_macos then
-    wezterm.background_child_process({ "afplay", "/System/Library/Sounds/Blow.aiff" })
-  end
+  wezterm.background_child_process(bell_sound)
   window:toast_notification("WezTerm", "タスク完了: " .. pane:get_title(), nil, 4000)
 end)
 
