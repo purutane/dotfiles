@@ -36,6 +36,11 @@ setopt hist_ignore_all_dups
 setopt hist_reduce_blanks
 setopt inc_append_history
 setopt share_history
+
+# silence ZLE beeps: backspace on an empty line (and failed completions) emits
+# BEL, which plays the wezterm bell sound and flags the window in tmux
+unsetopt beep hist_beep list_beep
+
 bindkey -v
 
 zstyle :compinstall filename "${ZDOTDIR}/.zshrc"
