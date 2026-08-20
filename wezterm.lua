@@ -42,7 +42,8 @@ config.keys = {
   { key = "Enter", mods = "SHIFT", action = wezterm.action.SendString("\x1b\r") },
 }
 
--- bell -> sound + toast notification (tmux forwards pane bells)
+-- bell -> sound only (tmux forwards pane bells). which window rang is shown by
+-- tmux's status line (window-status-bell-style), so no toast is needed here.
 -- wezterm itself has no audio path (the binary links no audio library, and
 -- SystemBeep is a no-op under Wayland), so play the sound ourselves.
 local is_macos = wezterm.target_triple:find("apple%-darwin") ~= nil
@@ -55,9 +56,8 @@ else
   bell_sound = { "paplay", "/usr/share/sounds/freedesktop/stereo/complete.oga" }
 end
 
-wezterm.on("bell", function(window, pane)
+wezterm.on("bell", function()
   wezterm.background_child_process(bell_sound)
-  window:toast_notification("WezTerm", "タスク完了: " .. pane:get_title(), nil, 4000)
 end)
 
 return config
