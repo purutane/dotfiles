@@ -14,8 +14,15 @@ A collection of configuration files for a modern development environment with Ne
 
 1. Install dependencies (macOS):
    ```bash
-   brew install neovim tmux fzf ripgrep direnv node python
-   brew install --cask wezterm
+   # Build toolchain (C compiler / linker). Required to compile Treesitter
+   # parsers, telescope-fzf-native and LuaSnip's jsregexp.
+   xcode-select --install
+
+   # CLI tools
+   brew install neovim tmux fzf ripgrep direnv jq tree-sitter-cli node python
+
+   # Terminal and fonts
+   brew install --cask wezterm font-udev-gothic-nf font-symbols-only-nerd-font
    ```
 
 2. Clone the repository:
@@ -39,19 +46,31 @@ A collection of configuration files for a modern development environment with Ne
 ### Required
 - **Zsh**: Shell
 - **Git**: Version control
+- **Homebrew** (macOS): Package manager
+- **jq**: Used by `install.sh` to merge Claude hooks into `~/.claude/settings.json`
+
+### Required for Neovim
+Neovim starts without these, but plugin installation fails on first launch until they are present.
+
+| Dependency | Install | Needed by |
+|-----------|---------|-----------|
+| Xcode Command Line Tools | `xcode-select --install` | C compiler / linker for Treesitter parsers (`:TSUpdate`), `telescope-fzf-native` (`make`), LuaSnip `jsregexp` |
+| tree-sitter CLI | `brew install tree-sitter-cli` | `nvim-treesitter` (main branch) downloads and builds parsers through the CLI |
+| curl | preinstalled on macOS | Parser downloads by `nvim-treesitter` and package downloads by Mason |
+| Node.js / npm | `brew install node` | Mason npm packages: `ts_ls`, `html`, `cssls`, `jsonls`, `yamlls`, `astro`, `bashls`, `pyright`, `prettierd`; also `copilot.vim` |
+| Python 3 | `brew install python` | `ruff`, Python venv detection |
+| Neovim >= 0.10 | `brew install neovim` | — |
 
 ### Optional (for enhanced features)
-- **Neovim**: Text editor
 - **tmux**: Terminal multiplexer
 - **WezTerm**: Terminal emulator (`brew install --cask wezterm`)
+- **Fonts**: `UDEV Gothic 35NFLG` and `Symbols Nerd Font Mono` for WezTerm (`brew install --cask font-udev-gothic-nf font-symbols-only-nerd-font`)
 - **fzf**: Fuzzy finder
 - **ripgrep**: Fast text search
 - **direnv**: Environment variable management
-- **Homebrew** (macOS): Package manager
-- **Node.js**: Required for web/JSON LSP servers (ts_ls, html, cssls, astro, jsonls)
-- **Python**: Required for Python LSP servers (pyright, ruff)
+- **Terraform**: `terraform_fmt` formatter for `.tf` / `.hcl` files (conform.nvim)
 
-The configuration includes helpful installation hints for missing dependencies.
+The zsh configuration prints an installation hint on startup for missing optional tools.
 
 ### PATH
 The following directories are automatically added to `PATH` if they exist:
@@ -82,7 +101,7 @@ Language servers are automatically installed via Mason on first launch.
 - Web development (ts_ls, html, cssls, astro)
 - JSON (jsonls with SchemaStore)
 
-Mason also auto-installs: `stylua`, `shellcheck`, `prettier`
+Mason also auto-installs: `stylua`, `shellcheck`, `prettierd`
 
 #### LSP Keymaps (active when LSP attaches)
 
@@ -214,6 +233,20 @@ nvim --headless "+Lazy sync" +qa
 
 **Neovim first launch is slow**
 lazy.nvim automatically installs all plugins on first launch. Wait for it to complete, then restart Neovim.
+
+**Treesitter: `curl: (77) error setting certificate verify locations`**
+`CURL_CA_BUNDLE` (or `SSL_CERT_FILE`) points to a file that no longer exists, so every curl download fails before it starts. Check with `echo $CURL_CA_BUNDLE` and either restore the file or remove the export (typically in `zsh/zprofile.local`). Git is unaffected, so plugins clone fine while parsers fail.
+
+**Treesitter: `ld: tapi error: malformed file ... unknown architecture`**
+The Command Line Tools linker is older than the SDK it is linking against (for example after a macOS upgrade). Even `clang hello.c` fails. Update the Command Line Tools:
+```bash
+softwareupdate --list                      # look for "Command Line Tools for Xcode"
+softwareupdate --install "Command Line Tools for Xcode <version>"
+```
+As a temporary workaround, point `SDKROOT` at an SDK that matches the installed tools, e.g. `export SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.sdk`.
+
+**Mason: `Could not find executable "npm" in PATH`**
+Node.js is missing. Install it (`brew install node`), restart Neovim, then run `:Mason` or `:MasonToolsInstall` to retry the failed packages. `:checkhealth mason` lists which runtimes Mason can see.
 
 **`zshrc.local` / `zprofile.local` not found**
 These files are intentionally excluded from the repository (for environment-specific variables, secrets, etc.). If `zsh/zshrc.local` or `zsh/zprofile.local` exist in the dotfiles directory, `install.sh` will symlink them automatically. Otherwise, create them manually as needed:
